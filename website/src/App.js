@@ -16,8 +16,8 @@ const App = () => {
     { time: 5, value: 7 },
     { time: 6, value: 6 },
     { time: 7, value: 3 },
-    { time: 8, value: 2 },
-    { time: 9, value: 0 }
+    { time: 8, value: 4 },
+    { time: 9, value: 3 }
   ];
 
   return (
@@ -30,8 +30,7 @@ const App = () => {
         onHide={() => setVisible(false)}
         vertical
         visible={visible}
-        width='thin'
-      >
+        width='thin'>
         <Menu.Item as='a'>
           <Icon name='home' />
               Home
@@ -67,7 +66,7 @@ const App = () => {
                 <LineChart
                   data={data}
                   title={'Teste2'}
-                  color="#3E517A"
+                  color="#000"
                 />
               </Grid.Column>
             </Grid.Row>
