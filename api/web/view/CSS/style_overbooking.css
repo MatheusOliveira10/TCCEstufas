@@ -1,0 +1,75 @@
+.seat_o {
+    display: flex;
+    flex: 0 0 20%;
+    padding: 4px;
+    position: relative;
+}
+
+.seat_o:nth-child(2) {
+    margin-right: 20%;
+}
+
+.seat_o input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+}
+
+.seat_o input[type=checkbox]:checked + label {
+    background: #e44646;
+    -webkit-animation-name: rubberBand;
+    animation-name: rubberBand;
+    animation-duration: 300ms;
+    animation-fill-mode: both;
+}
+
+.seat_o input[type=checkbox]:disabled + label {
+    background: #dddddd;
+    text-indent: -9999px;
+    overflow: hidden;
+}
+
+.seat_o input[type=checkbox]:disabled + label:after {
+    content: "X";
+    text-indent: 0;
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+
+.seat_o input[type=checkbox]:disabled + label:hover {
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.seat_o label {
+    display: block;
+    position: relative;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.5rem;
+    padding: 4px 0;
+    background: rgb(176, 92, 224);
+    border-radius: 5px;
+    animation-duration: 300ms;
+    animation-fill-mode: both;
+}
+
+.seat_o label:before {
+    content: "";
+    position: absolute;
+    width: 75%;
+    height: 75%;
+    top: 1px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.seat_o label:hover {
+    cursor: pointer;
+    box-shadow: 0 0 0px 2px #5C6AFF;
+}

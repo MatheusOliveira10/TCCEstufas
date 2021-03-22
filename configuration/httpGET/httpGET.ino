@@ -4,6 +4,9 @@
 
 uint8_t mac[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 byte ip[] = { 192, 168, 8, 185 };
+int sensores[20];
+char* nomes[20];
+int i;
 
 void setup() {
   // Initialize Serial port
@@ -74,28 +77,16 @@ void setup() {
     return;
   }
 
-  JsonArray arr = doc.as<JsonArray>();
-  
   // using C++11 syntax (preferred):
   for (JsonVariant value : arr) {
-      Serial.print("Nome do sensor: ");
-      Serial.print(value["sensor"].as<char*>());
-      Serial.print(" Porta: ");
-      Serial.println(value["porta"].as<int>());
+      sensores[i] = value["porta"].as<int>();
+      nomes[i] = value["sensor"].as<char*>();
   }
 
-  // Extract values
-  //Serial.println(F("Response:"));
-  //Serial.println(doc[0]["sensor"].as<char*>());
-  //Serial.println(doc[0]["porta"].as<int>());
-  //Serial.println(doc["sensor"].as<char*>());
-  //Serial.println(doc["time"].as<long>());
-  //Serial.println(doc["data"][0].as<float>(), 6);
-  //Serial.println(doc["data"][1].as<float>(), 6);
-
-  //JsonArray array = doc.to<JsonArray>();
-  //Serial.print(F("Tamanho:"));
-  //Serial.print(array.size());
+  for(i = 0; i < arr.size; i++) {
+    Serial.println(sensores[i]);
+    Serial.println(nomes[i]);
+  }
 
   // Disconnect
   client.stop();
