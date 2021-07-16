@@ -1,6 +1,3 @@
-import React, { useState } from 'react'
-import '../customStyles.css'
-
 const Erro404 = () => {
     return (
         404

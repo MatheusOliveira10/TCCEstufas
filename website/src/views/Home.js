@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Header, Divider, Grid, Sidebar, Menu, Icon, Container } from 'semantic-ui-react'
+import React from 'react'
+import { Header, Divider, Grid, Icon } from 'semantic-ui-react'
 import LineChart from '../components/LineChart'
-import customStyles from '../customStyles'
+import { colors } from '../customStyles'
 
 const Home = () => {
     const data = [
@@ -18,7 +18,7 @@ const Home = () => {
     ];
 
     return (<>
-        <Header style={{ marginTop: 20, color: customStyles.colors.green }} as='h2' icon textAlign='center'>
+        <Header style={{ marginTop: 20, color: colors.green }} as='h2' icon textAlign='center'>
             <Icon name='info' />
                 Monitoramento da Estufa
         </Header>

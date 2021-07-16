@@ -1,50 +1,33 @@
-import React, { useState } from 'react'
+import React from 'react'
 import '../customStyles.css'
-import Home from '../views/Home'
-import Erro404 from '../views/Erro404'
-import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
-import { Sidebar, Menu, Icon, Container } from 'semantic-ui-react'
-import customStyles from '../customStyles'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { Menu, Icon, Container } from 'semantic-ui-react'
+import { routes } from '../routes'
+import uniqid from 'uniqid'
 
 const App = () => {
-  const [visible, setVisible] = useState(true)
-
-  return (
-    <Sidebar.Pushable>
-      <Sidebar
-        as={Menu}
-        animation='overlay'
-        icon='labeled'
-        inverted
-        onHide={() => setVisible(false)}
-        vertical
-        visible={visible}
-        width='thin'>
-        <Menu.Item as='a' href="/">
-          <Icon name='home' />
-              Home
+  return (<div>
+    <Menu color='green' inverted className='top fixed'>
+      <Menu.Item header icon>Estufas</Menu.Item>
+      {routes.map((item) => {
+        if (item.path !== '*') {
+          return <Menu.Item as='a' href={item.path} key={uniqid()}>
+            <Icon name={item.icon} /> {item.title}
           </Menu.Item>
-        <Menu.Item as='a' href="/cs">
-          <Icon name='gamepad' />
-            Games
-        </Menu.Item>
-      </Sidebar>
+        }
 
-      <Sidebar.Pusher style={{ width: '100vw', height: '100vh', backgroundColor: customStyles.colors.isabelline }}>
-        <Icon style={{ color: customStyles.colors.green }} onClick={() => { setVisible(true) }} name='content' size='large' style={{ padding: 15 }} />
+        return null
+      })}
+    </Menu>
 
-        <Container>
-          <BrowserRouter>
-            <Switch>
-              <Route path="/" exact={true} component={Home} />
-              <Route path="*" component={Erro404} />
-            </Switch>
-          </BrowserRouter>
-        </Container>
-
-      </Sidebar.Pusher>
-    </Sidebar.Pushable>
-  )
+    <Container style={{ marginTop: '4em' }}>
+      <BrowserRouter>
+        <Switch>
+          {routes.map(item => <Route path={item.path} exact={item.exact} component={item.component} key={uniqid()}/>)}
+        </Switch>
+      </BrowserRouter>
+    </Container>
+  </div>)
 }
 
 export default App
