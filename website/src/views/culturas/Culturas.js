@@ -73,10 +73,6 @@ const Culturas = () => {
                 <Button color='primary' onClick={adicionar}>
                     Salvar
                 </Button>
-                <div class="or" data-text="ou"></div>
-                <Button color='grey'>
-                    Cancelar
-                </Button>
             </Button.Group>
         </Form>
 
