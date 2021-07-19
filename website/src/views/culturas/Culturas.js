@@ -7,12 +7,12 @@ const val = [
     {
         id: 1,
         descricao: 'Estufa 1',
-        ativa: true
+        isAtiva: true
     },
     {
         id: 2,
         descricao: 'Estufa 2',
-        ativa: false
+        isAtiva: false
     }
 ]
 
@@ -30,11 +30,18 @@ const Culturas = () => {
         await setValores([...valores,  {
             id: uniqid(),
             descricao,
-            ativa: isAtiva
+            isAtiva
         }])
 
         setDescricao('')
         setIsAtiva(true)
+    }
+
+    const editar = async (id) => {
+        let registro = valores.find(item => item.id === id)
+
+        await setDescricao(registro.descricao)
+        await setIsAtiva(registro.isAtiva)
     }
 
     const deletar = async (id) => {
@@ -45,7 +52,7 @@ const Culturas = () => {
         {
             icon: 'pencil',
             color: 'green',
-            action: adicionar
+            action: editar
         },
         {
             icon: 'times',
@@ -66,11 +73,11 @@ const Culturas = () => {
                 <Form.Input value={descricao} onChange={item => setDescricao(item.target.value)} label='Descrição' placeholder='Descrição' />
                 <Form.Field>
                     <label>Está Ativa?</label>
-                    <Checkbox defaultChecked={isAtiva} onClick={() => { setIsAtiva(!isAtiva) }} toggle style={{ marginTop: 5 }} />
+                    <Checkbox checked={isAtiva} onChange={() => { setIsAtiva(!isAtiva) }} toggle style={{ marginTop: 5 }} />
                 </Form.Field>
             </Form.Group>
             <Button.Group floated='right' style={{ marginBottom: 20 }}>
-                <Button color='primary' onClick={adicionar}>
+                <Button primary onClick={adicionar}>
                     Salvar
                 </Button>
             </Button.Group>
@@ -78,8 +85,8 @@ const Culturas = () => {
 
         <Table
             unstackable
-            headers={['Descrição', 'Ativa']}
-            keys={['descricao', 'ativa']}
+            headers={['Descrição', 'Ativa?']}
+            keys={['descricao', 'isAtiva']}
             values={valores} 
             actions={actions} />
     </div>
