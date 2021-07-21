@@ -21,31 +21,53 @@ const Culturas = () => {
     const [valores, setValores] = useState([])
     const [descricao, setDescricao] = useState('')
     const [isAtiva, setIsAtiva] = useState(true)
+    const [isEditing, setIsEditing] = useState(false)
+    const [index, setIndex] = useState(false)
     
     useEffect(() => {
         setValores(val)
     }, [])
 
-    const adicionar = async () => {
-        await setValores([...valores,  {
-            id: uniqid(),
-            descricao,
-            isAtiva
-        }])
+    const salvar = async () => {
+        if(isEditing) {
+            let aux = valores;
+
+            valores[index].descricao = descricao;
+            valores[index].isAtiva = isAtiva;
+
+            await setValores(aux)
+            await setIsEditing(false)
+        } else {
+            await setValores([...valores,  {
+                id: uniqid(),
+                descricao,
+                isAtiva
+            }])
+        }
 
         setDescricao('')
         setIsAtiva(true)
     }
 
     const editar = async (id) => {
-        let registro = valores.find(item => item.id === id)
+        let index = valores.findIndex(item => item.id === id)
 
-        await setDescricao(registro.descricao)
-        await setIsAtiva(registro.isAtiva)
+        await setIsEditing(true)
+        await setIndex(index)
+
+        await setDescricao(valores[index].descricao)
+        await setIsAtiva(valores[index].isAtiva)
     }
 
     const deletar = async (id) => {
         await setValores(valores.filter(item => item.id !== id))
+    }
+
+    const cancelar = async () => {
+        await setIsEditing(false)
+
+        setDescricao('')
+        setIsAtiva(true)
     }
 
     const actions = [
@@ -77,8 +99,12 @@ const Culturas = () => {
                 </Form.Field>
             </Form.Group>
             <Button.Group floated='right' style={{ marginBottom: 20 }}>
-                <Button primary onClick={adicionar}>
+                <Button primary onClick={salvar}>
                     Salvar
+                </Button>
+                <div class="or" data-text="ou"></div>
+                <Button onClick={cancelar}>
+                    Cancelar
                 </Button>
             </Button.Group>
         </Form>
@@ -88,7 +114,9 @@ const Culturas = () => {
             headers={['Descrição', 'Ativa?']}
             keys={['descricao', 'isAtiva']}
             values={valores} 
-            actions={actions} />
+            actions={actions} 
+            isEditing={isEditing}
+            index={index}/>
     </div>
 }
 
