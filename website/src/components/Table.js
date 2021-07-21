@@ -2,7 +2,7 @@ import React from 'react'
 import { Table as SemanticTable, Icon, Button } from 'semantic-ui-react'
 import uniqid from 'uniqid'
 
-const Table = ({ headers, keys, values, actions, unstackable }) => {
+const Table = ({ headers, keys, values, actions, unstackable, isEditing, index }) => {
     return <SemanticTable celled unstackable={unstackable}>
         <SemanticTable.Header>
             <SemanticTable.Row>
@@ -15,8 +15,8 @@ const Table = ({ headers, keys, values, actions, unstackable }) => {
         </SemanticTable.Header>
 
         <SemanticTable.Body>
-            {values.map(item => {
-                return <SemanticTable.Row key={uniqid()}>
+            {values.map((item, id) => {
+                return <SemanticTable.Row active={isEditing && index === id} key={uniqid()}>
                     {keys.map(head => {
                         if (typeof item[head] == 'boolean') {
                             return <SemanticTable.Cell className='center aligned' key={uniqid()}>

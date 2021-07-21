@@ -16,14 +16,14 @@ const App = () => {
           </Menu.Item>
         }
 
-        return null 
+        return null
       })}
     </Menu>
 
     <Container style={{ marginTop: '4em' }}>
       <BrowserRouter>
         <Switch>
-          {routes.map(item => <Route path={item.path} exact={item.exact} component={item.component} key={uniqid()}/>)}
+          {routes.map(item => <Route path={item.path} exact={item.exact} component={item.component} key={uniqid()} />)}
         </Switch>
       </BrowserRouter>
     </Container>
