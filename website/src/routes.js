@@ -3,6 +3,7 @@ import Erro404 from './views/Erro404'
 import Culturas from './views/culturas/Culturas'
 import Controladores from './views/controladores/Controladores'
 import Leituras from './views/leituras/Leituras'
+import Sensores from './views/sensores/Sensores'
 
 const routes = [
     {
@@ -27,10 +28,17 @@ const routes = [
         title: 'Controladores'    
     },
     {
+        path: '/sensores',
+        exact: true,
+        component: Sensores,
+        icon: 'sitemap',
+        title: 'Sensores'    
+    },
+    {
         path: '/leituras',
         exact: true,
         component: Leituras,
-        icon: 'sticky note',
+        icon: 'line graph',
         title: 'Leituras'    
     },
     {
