@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
-require "web/model/query.php";
+require "controller/LeituraController.php";
 
 use Workerman\Worker;
 
@@ -8,20 +8,22 @@ $worker = new Worker();
 
 $worker->onWorkerStart = function(){
     $mqtt = new Workerman\Mqtt\Client('mqtt://test.mosquitto.org:1883');
-
+    
     $mqtt->onConnect = function($mqtt) {
         $mqtt->subscribe('mobg/#', ["qos" => 2]);
     };
-
+    
     $mqtt->onMessage = function($topic, $content){
-        echo("topic");
-        $pdo = new Query();
+        echo "Tópico: " . $topic;
+        echo "\nConteúdo: " . $content;
 
-        $qry = "INSERT INTO teste(teste) VALUES (";
-        $qry .= "'" . $content . "'";
-        $qry .= ")";
+        $controller = new LeituraController();
 
-        $pdo->insert($qry);
+        $conteudo = new \stdClass();
+        $conteudo->sensor = explode('/', $topic)[1];
+        $conteudo->valor = $content;
+
+        $controller->store($conteudo);
     };
 
     $mqtt->connect();
