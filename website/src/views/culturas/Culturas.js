@@ -32,8 +32,8 @@ const Culturas = () => {
         if(isEditing) {
             let aux = valores;
 
-            valores[index].descricao = descricao;
-            valores[index].isAtiva = isAtiva;
+            aux[index].descricao = descricao;
+            aux[index].isAtiva = isAtiva;
 
             await setValores(aux)
             await setIsEditing(false)

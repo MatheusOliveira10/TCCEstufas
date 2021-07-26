@@ -29,7 +29,7 @@ const Controladores = () => {
         if(isEditing) {
             let aux = valores;
 
-            valores[index].nome = nome;
+            aux[index].nome = nome;
 
             await setValores(aux)
             await setIsEditing(false)
