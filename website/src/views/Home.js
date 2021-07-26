@@ -1,26 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Header, Divider, Grid, Icon } from 'semantic-ui-react'
 import LineChart from '../components/LineChart'
 import { colors } from '../customStyles'
+import mqtt from 'mqtt'
+
+let array = [
+    { time: 0, value: 8 },
+    { time: 1, value: 5 },
+    { time: 2, value: 4 },
+    { time: 3, value: 9 },
+    { time: 4, value: 1 },
+    { time: 5, value: 7 },
+    { time: 6, value: 6 },
+    { time: 7, value: 3 },
+    { time: 8, value: 4 },
+    { time: 9, value: 3 }
+];
 
 const Home = () => {
-    const data = [
-        { time: 0, value: 8 },
-        { time: 1, value: 5 },
-        { time: 2, value: 4 },
-        { time: 3, value: 9 },
-        { time: 4, value: 1 },
-        { time: 5, value: 7 },
-        { time: 6, value: 6 },
-        { time: 7, value: 3 },
-        { time: 8, value: 4 },
-        { time: 9, value: 3 }
-    ];
+    const [data, setData] = useState(array)
+    
+    useEffect(() => {
+        var client = mqtt.connect('wss://test.mosquitto.org:8081')
+
+        client.on('connect', function () {
+            client.subscribe('mobg/#', { qos: 2 })
+        })
+
+        client.on('message', async function (topic, message) {
+            await setData(oldData => [...oldData, { time: oldData.length, value: message }]);
+        })
+    }, [])
 
     return (<>
         <Header style={{ marginTop: 20, color: colors.green }} as='h2' icon textAlign='center'>
             <Icon name='info' />
-                Monitoramento da Estufa
+            Monitoramento da Estufa
         </Header>
 
         <Divider />
