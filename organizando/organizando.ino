@@ -5,7 +5,7 @@
 #include "MyFunctions.h"
 
 uint8_t mac[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
-byte ip[] = { 192, 168, 8, 185 };
+//byte ip[] = { 192, 168, 8, 185 };
 char* sensores[20];
 char* portas[20];
 int tipoPorta[20];
@@ -47,7 +47,7 @@ void setup() {
     return;
   }
   
-  // Check HTTP status
+  // Checar status HTTP
   char status[32] = {0};
   ethClient.readBytesUntil('\r', status, sizeof(status));
   if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
@@ -58,7 +58,7 @@ void setup() {
     return;
   }
 
-  // Skip HTTP headers
+  // Pular headers HTTP
   char endOfHeaders[] = "\r\n\r\n";
   if (!ethClient.find(endOfHeaders)) {
     Serial.println(F("Resposta Inválida"));
@@ -66,7 +66,7 @@ void setup() {
     return;
   }
 
-  // Allocate the JSON document
+  // Alocar um documento JSON 
   const size_t capacity = 200;
   DynamicJsonDocument doc(capacity);
 
@@ -103,6 +103,9 @@ void setup() {
 }
 
 void loop() {   
+  //loop através dos sensores
+  //para leitura e envio dos dados da estufa
+  
   for(i = 0; i < numElementos; i++) {
     //concatenando string para envio do tópico
     const size_t len1 = strlen("mobg/");
@@ -113,7 +116,7 @@ void loop() {
     memcpy(topic + len1, sensores[i], len2 + 1); 
     
     //alocando espaço para a mensagem
-    char *message = malloc(4); // +1 para o \0
+    char *message = malloc(50);
 
     //passando valor para a mensagem
     //aqui no lugar do "10" vai o conteúdo da leitura
