@@ -8,12 +8,15 @@ export default class LineChart extends React.Component {
     }
   
     componentDidUpdate() {
-      this.myChart.data.labels = this.props.data.map(d => d.time);
-      this.myChart.data.datasets[0].data = this.props.data.map(d => d.value);
+      let data = Object.values(this.props.data)
+      this.myChart.data.labels = data.map(d => d.created_at);
+      
+      this.myChart.data.datasets[0].data = data.map(d => d.valor);
       this.myChart.update();
     }
   
     componentDidMount() {
+      console.log(this.props.data)
       this.myChart = new Chart(this.canvasRef.current, {
         type: 'line',
         options: {
