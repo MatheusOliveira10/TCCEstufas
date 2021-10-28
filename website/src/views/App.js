@@ -1,5 +1,5 @@
 import React from 'react'
-import '../customStyles.css'
+import '../assets/css/customStyles.css'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import { Menu, Icon, Container } from 'semantic-ui-react'
 import { routes } from '../routes'

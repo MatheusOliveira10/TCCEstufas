@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Header, Divider, Grid, Icon } from 'semantic-ui-react'
 import LineChart from '../components/LineChart'
-import { colors } from '../customStyles'
+import { colors } from '../assets/js/customStyles'
 import mqtt from 'mqtt'
 import axios from 'axios'
+import Cultura from '../components/Cultura'
 
 let array = [
     { time: 0, value: 8 },
@@ -19,17 +20,20 @@ let array = [
 ];
 
 const Home = () => {
-    const [data, setData] = useState([])
+    const [culturas, setCulturas] = useState([])
+    const [controladores, setControladores] = useState([])
+    const [sensores, setSensores] = useState([])
+    const [leituras, setLeituras] = useState([])
 
     const handleMQTT = () => {
-        var client = mqtt.connect('wss://test.mosquitto.org:8081')
+        var client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
 
         client.on('connect', function () {
             client.subscribe('mobg/#', { qos: 2 })
         })
 
         client.on('message', async function (topic, message) {
-            await setData(oldData => [...oldData, { time: oldData.length, value: message }]);
+            await setLeituras(oldData => [...oldData, { time: oldData.length, value: message }]);
         })
     }
 
@@ -38,7 +42,10 @@ const Home = () => {
 
         console.log(response.data)
 
-        await setData(response.data)
+        await setCulturas(response.data.culturas)
+        await setControladores(response.data.controladores)
+        await setSensores(response.data.sensores)
+        await setLeituras(response.data.leituras)
     }
 
     useEffect(() => {
@@ -57,17 +64,12 @@ const Home = () => {
         <Grid stackable>
             <Grid.Row columns='equal'>
                 <Grid.Column style={{ alignItems: 'center', backgroundColor: 'white', borderRadius: 10, padding: 20 }}>
-                    {Object.keys(data).map(cultura => {
-                        return Object.keys(data[cultura]).map(controlador => {
-                            return Object.keys(data[cultura][controlador]).map(sensor => {
-                                return Object.keys(data[cultura][controlador][sensor]).map(leitura => {
-                                    let registro = data[cultura][controlador][sensor][leitura];
-                                    
-                                    return registro.cultura_descricao
-                                    console.log(data[cultura][controlador][sensor][leitura])
-                                })
-                            })
-                        })
+                    {culturas.map(cultura => {
+                        return <Cultura id={cultura.id} 
+                                        culturas={culturas} 
+                                        controladores={controladores}
+                                        sensores={sensores}
+                                        leituras={leituras} />
                     })}
                 </Grid.Column>
             </Grid.Row>

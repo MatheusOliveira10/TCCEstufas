@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css'
 import App from './views/App';
 import reportWebVitals from './reportWebVitals';
+import axios from 'axios'
+
+axios.defaults.baseURL = 'http://localhost:4000';
+// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+// axios.defaults.baseURL = 'http://tccmatheusebruno.ddns.net';
 
 ReactDOM.render(
   <React.StrictMode>
