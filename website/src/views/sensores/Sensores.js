@@ -100,7 +100,7 @@ const Sensores = () => {
                 descricao,
                 porta,
                 tipo_porta: tipoPorta,
-                controlador: controlador_id,
+                controlador_id: controlador_id,
                 tipo_sensor: tipoSensor,
                 referencia_minima: referenciaMinima,
                 referencia_maxima: referenciaMaxima,
@@ -237,7 +237,7 @@ const Sensores = () => {
                         <Table.Cell key={uniqid()}>{getTipoSensorPorExtenso(item.tipo_sensor)}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.referencia_minima}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.referencia_maxima}</Table.Cell>
-                        <Table.Cell key={uniqid()}>{controladores.find(con => con.id === item.controlador_id).nome}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{controladores.find(con => con.id === item.controlador_id)?.nome}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.unidade}</Table.Cell>
                         
                         <Table.Cell className='center aligned'>
