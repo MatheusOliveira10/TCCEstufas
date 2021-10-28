@@ -8,24 +8,33 @@ const val = [
         descricao: 'Sensor de Umidade - Porta',
         porta: 12,
         tipo_porta: 0,
-        tipo_porta_extenso: 'Analógica',
-        controlador: 1
+        tipo_sensor: 'U',
+        unidade: '%',
+        referencia_minima: 200,
+        referencia_maxima: 500,
+        controlador_id: 1
     },
     {
         id: 2,
         descricao: 'Sensor de Luminosidade - Teto',
         porta: 13,
         tipo_porta: 1,
-        tipo_porta_extenso: 'Digital',
-        controlador: 2
+        tipo_sensor: 'L',
+        unidade: 'lux',
+        referencia_minima: 200,
+        referencia_maxima: 500,
+        controlador_id: 2
     },
     {
         id: 3,
         descricao: 'Sensor de Umidade do Solo - Meio',
         porta: 14,
         tipo_porta: 0,
-        tipo_porta_extenso: 'Analógica',
-        controlador: 1
+        tipo_sensor: 'H',
+        unidade: '',
+        referencia_minima: 200,
+        referencia_maxima: 500,
+        controlador_id: 1
     }
 ]
 
@@ -36,7 +45,11 @@ const Sensores = () => {
     const [descricao, setDescricao] = useState('')
     const [porta, setPorta] = useState('')
     const [tipoPorta, setTipoPorta] = useState('')
-    const [controlador, setControlador] = useState(null)
+    const [tipoSensor, setTipoSensor] = useState('')
+    const [referenciaMinima, setReferenciaMinima] = useState('')
+    const [referenciaMaxima, setReferenciaMaxima] = useState('')
+    const [unidade, setUnidade] = useState('')
+    const [controlador_id, setControlador] = useState(null)
     const [controladores, setControladores] = useState([
         {
             id: 1,
@@ -58,7 +71,11 @@ const Sensores = () => {
     const limparFormulario = () => {
         setDescricao('')
         setPorta('')
+        setReferenciaMinima('')
+        setReferenciaMaxima('')
+        setUnidade('')
         setTipoPorta(null)
+        setTipoSensor(null)
         setControlador(null)
     }
 
@@ -68,8 +85,12 @@ const Sensores = () => {
 
             aux[index].descricao = descricao;
             aux[index].porta = porta;
-            aux[index].tipoPorta = tipoPorta;
-            aux[index].controlador = controlador;
+            aux[index].tipo_porta = tipoPorta;
+            aux[index].tipo_sensor = tipoSensor;
+            aux[index].controlador_id = controlador_id;
+            aux[index].referencia_minima = referenciaMinima;
+            aux[index].referencia_maxima = referenciaMaxima;
+            aux[index].unidade = unidade;
 
             await setValores(aux)
             await setIsEditing(false)
@@ -78,8 +99,12 @@ const Sensores = () => {
                 id: uniqid(),
                 descricao,
                 porta,
-                tipoPorta,
-                controlador
+                tipo_porta: tipoPorta,
+                controlador: controlador_id,
+                tipo_sensor: tipoSensor,
+                referencia_minima: referenciaMinima,
+                referencia_maxima: referenciaMaxima,
+                unidade
             }])
         }
 
@@ -94,8 +119,12 @@ const Sensores = () => {
 
         await setDescricao(valores[index].descricao)
         await setPorta(valores[index].porta)
-        await setTipoPorta(valores[index].tipoPorta)
-        await setControlador(valores[index].controladorSelecionado)
+        await setTipoPorta(valores[index].tipo_porta)
+        await setControlador(valores[index].controlador_id)
+        await setReferenciaMinima(valores[index].referencia_minima)
+        await setReferenciaMaxima(valores[index].referencia_maxima)
+        await setUnidade(valores[index].unidade)
+        await setTipoSensor(valores[index].tipo_sensor)
     }
 
     const deletar = async (id) => {
@@ -106,6 +135,19 @@ const Sensores = () => {
         await setIsEditing(false)
 
         limparFormulario()
+    }
+
+    const getTipoSensorPorExtenso = (tipoSensor) => {
+        switch (tipoSensor) {
+            case 'L':
+                return "Luminosidade"
+            case 'H':
+                return "Higrômetro"
+            case 'U':
+                return "Umidade"
+            case 'T':
+                return "Temperatura do Ar"
+        }
     }
 
     const actions = [
@@ -131,6 +173,13 @@ const Sensores = () => {
         { key: uniqid(), text: 'Arduino Mega 2560 - Janela', value: 2 }
     ]
 
+    const optionsTipoSensor = [
+        { key: uniqid(), text: 'Luminosidade', value: 'L' },
+        { key: uniqid(), text: 'Umidade do Ar', value: 'U' },
+        { key: uniqid(), text: 'Higrômetro', value: 'H' },
+        { key: uniqid(), text: 'Temperatura do Ar', value: 'T' }
+    ]
+
     return <div>
         <Grid>
             <Grid.Column floated='left' width={5}>
@@ -145,7 +194,13 @@ const Sensores = () => {
             </Form.Group>
             <Form.Group widths='equal'>
                 <Form.Select options={optionsTipoPorta} onChange={(e, { value }) => { setTipoPorta(value) }} value={tipoPorta} label='Tipo da Porta' placeholder='Tipo da Porta' />
-                <Form.Select options={optionsControladores} label='Controlador' placeholder='Controlador' onChange={(e, { value }) => { setControlador(value) }} value={controlador}/>
+                <Form.Select options={optionsControladores} label='Controlador' placeholder='Controlador' onChange={(e, { value }) => { setControlador(value) }} value={controlador_id}/>
+                <Form.Select options={optionsTipoSensor} label='Tipo do Sensor' placeholder='Tipo do Sensor' onChange={(e, { value }) => { setTipoSensor(value) }} value={tipoSensor}/>
+            </Form.Group>
+            <Form.Group widths='equal'>
+                <Form.Input value={referenciaMinima} onChange={item => setReferenciaMinima(item.target.value)} label='Referência Mínina' placeholder='Referência Mínina' />
+                <Form.Input value={referenciaMaxima} onChange={item => setReferenciaMaxima(item.target.value)} label='Referência Máxima' placeholder='Referência Máxima' />
+                <Form.Input value={unidade} onChange={item => setUnidade(item.target.value)} label='Unidade' placeholder='ex. %, lux...' />
             </Form.Group>
             <Button.Group floated='right' style={{ marginBottom: 20 }}>
                 <Button primary onClick={salvar}>
@@ -164,7 +219,11 @@ const Sensores = () => {
                     <Table.HeaderCell key={uniqid()}>Descrição</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Porta</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Tipo da Porta</Table.HeaderCell>
+                    <Table.HeaderCell key={uniqid()}>Tipo do Sensor</Table.HeaderCell>
+                    <Table.HeaderCell key={uniqid()}>Ref. Mínima</Table.HeaderCell>
+                    <Table.HeaderCell key={uniqid()}>Ref. Máxima</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Controlador</Table.HeaderCell>
+                    <Table.HeaderCell key={uniqid()}>Unidade</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Ações</Table.HeaderCell>
                 </Table.Row>
             </Table.Header>
@@ -175,7 +234,11 @@ const Sensores = () => {
                         <Table.Cell key={uniqid()}>{item.descricao}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.porta}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.tipo_porta == 0 ? 'Analógica' : 'Digital'}</Table.Cell>
-                        <Table.Cell key={uniqid()}>{controladores.find(con => con.id === item.controlador).nome}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{getTipoSensorPorExtenso(item.tipo_sensor)}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{item.referencia_minima}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{item.referencia_maxima}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{controladores.find(con => con.id === item.controlador_id).nome}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{item.unidade}</Table.Cell>
                         
                         <Table.Cell className='center aligned'>
                             {actions.map(action => {
