@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Header, Divider, Grid, Icon } from 'semantic-ui-react'
-import LineChart from '../components/LineChart'
+// import LineChart from '../components/LineChart'
 import { colors } from '../assets/js/customStyles'
 import mqtt from 'mqtt'
 import axios from 'axios'
 import Cultura from '../components/Cultura'
+import { useDispatch, useSelector } from 'react-redux'
+import * as AppActions from '../store/actions/app'
 
 let array = [
     { time: 0, value: 8 },
@@ -20,10 +22,11 @@ let array = [
 ];
 
 const Home = () => {
-    const [culturas, setCulturas] = useState([])
-    const [controladores, setControladores] = useState([])
-    const [sensores, setSensores] = useState([])
-    const [leituras, setLeituras] = useState([])
+    const dispatch = useDispatch();
+    const culturas = useSelector(state => state.app.culturas)
+    const controladores = useSelector(state => state.app.controladores)
+    const sensores = useSelector(state => state.app.sensores)
+    const leituras = useSelector(state => state.app.leituras)
 
     const handleMQTT = () => {
         var client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
@@ -33,19 +36,17 @@ const Home = () => {
         })
 
         client.on('message', async function (topic, message) {
-            await setLeituras(oldData => [...oldData, { time: oldData.length, value: message }]);
+            await dispatch(AppActions.setLeituras(oldData => [...oldData, { time: oldData.length, value: message }]));
         })
     }
 
     const getLeituras = async () => {
         let response = await axios.get('/leituras')
 
-        console.log(response.data)
-
-        await setCulturas(response.data.culturas)
-        await setControladores(response.data.controladores)
-        await setSensores(response.data.sensores)
-        await setLeituras(response.data.leituras)
+        await dispatch(AppActions.setCulturas(response.data.culturas))
+        await dispatch(AppActions.setControladores(response.data.controladores))
+        await dispatch(AppActions.setSensores(response.data.sensores))
+        await dispatch(AppActions.setLeituras(response.data.leituras))
     }
 
     useEffect(() => {

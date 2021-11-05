@@ -16,7 +16,6 @@ export default class LineChart extends React.Component {
     }
   
     componentDidMount() {
-      console.log(this.props.data)
       this.myChart = new Chart(this.canvasRef.current, {
         type: 'line',
         options: {

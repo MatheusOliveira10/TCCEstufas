@@ -5,7 +5,7 @@ import { colors } from '../assets/js/customStyles'
 const Sensor = ({ sensor, leituras }) => {
     // let controlador = controladores.find(item => item.id === id)
     let leiturasSensor = leituras.filter(item => item.sensor_id == sensor.id)
-    console.log(leiturasSensor)
+
     return <div style={styles.cardContainer}>
         <div>{sensor.descricao}</div>
         <Divider />

@@ -2,7 +2,7 @@ import Home from './views/Home'
 import Erro404 from './views/Erro404'
 import Culturas from './views/culturas/Culturas'
 import Controladores from './views/controladores/Controladores'
-import Leituras from './views/leituras/Leituras'
+import Relatorios from './views/relatorios/Relatorios'
 import Sensores from './views/sensores/Sensores'
 
 const routes = [
@@ -35,11 +35,11 @@ const routes = [
         title: 'Sensores'    
     },
     {
-        path: '/leituras',
+        path: '/relatorios',
         exact: true,
-        component: Leituras,
+        component: Relatorios,
         icon: 'line graph',
-        title: 'Leituras'    
+        title: 'Relatórios'    
     },
     {
         path: '*',
