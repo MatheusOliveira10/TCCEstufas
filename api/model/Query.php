@@ -14,15 +14,22 @@ class Query
     public static function insertOrUpdate($qry) {
         try {
             $pdo = new PDO(self::$dsn, self::$user, self::$pass);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+            // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES,false);
+            
             $stm = $pdo->prepare($qry);
+
+            if (!$stm) {
+                return json_encode(["sucesso" => false, "mensagem" => $pdo->errorInfo()[2]]);
+            }
 
             $stm->execute();
 
-            return true;
+            return json_encode(["sucesso" => true]);
         } catch (PDOException $e) {
-            echo "Erro:" . $e->getMessage();
+            // echo "Erro:" . $e->getMessage();
+            http_response_code(500);
+            return json_encode(["sucesso" => false, "mensagem" => $e->getMessage()]);
         }
 
         return;
@@ -43,6 +50,7 @@ class Query
 
             return json_encode($rows);
         } catch (PDOException $e) {
+            http_response_code(500);
             echo "Erro:" . $e->getMessage();
         }
     }
