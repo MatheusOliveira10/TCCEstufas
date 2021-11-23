@@ -4,11 +4,13 @@ require "controller/ControladorController.php";
 require "controller/CulturaController.php";
 require "controller/LeituraController.php";
 require "controller/SensorController.php";
+require "controller/RelatorioController.php";
 
 $controlador = new ControladorController();
 $cultura = new CulturaController();
 $leitura = new LeituraController();
 $sensor = new SensorController();
+$relatorio = new RelatorioController();
 
 function verificaMetodo($metodoCorreto) {
     if (!in_array($_SERVER['REQUEST_METHOD'], $metodoCorreto)) {
@@ -19,6 +21,22 @@ function verificaMetodo($metodoCorreto) {
 }
 
 $routes = [
+    "/" => function() use ($controlador) {
+        $arr = [
+            [
+                "id" => 1,
+                "tipoPorta" => 1,
+                "porta" => 15
+            ],
+            [
+                "id" => 2,
+                "tipoPorta" => 1,
+                "porta" => 16
+            ],
+        ];
+
+        echo json_encode($arr);
+    },
     "/controladores" => function() use ($controlador) {
         verificaMetodo(["GET", "POST", "PUT", "DELETE"]);
 
@@ -102,5 +120,8 @@ $routes = [
                 $leitura->delete($_POST);
                 break;    
         } 
+    },
+    "/relatorio" => function() use ($relatorio) {
+        $relatorio->gerar();
     },
 ];
