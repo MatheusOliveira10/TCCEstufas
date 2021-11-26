@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Table from '../../components/Table'
 import { Form, Checkbox, Grid, Button } from 'semantic-ui-react'
 import uniqid from 'uniqid'
+import axios from 'axios'
 
 const val = [
     {
@@ -20,24 +21,47 @@ const Controladores = () => {
     const [nome, setNome] = useState('')
     const [isEditing, setIsEditing] = useState(false)
     const [index, setIndex] = useState(false)
-    
-    useEffect(() => {
-        setValores(val)
+    const endpoint = '/controladores'
+
+    useEffect(async () => {
+        let response = await axios.get(endpoint)
+        setValores(response.data)
+        // setValores(val)
     }, [])
 
     const salvar = async () => {
+        let response;
+
         if(isEditing) {
             let aux = valores;
 
             aux[index].nome = nome;
 
-            await setValores(aux)
-            await setIsEditing(false)
+            try {
+                await axios.put(endpoint, aux[index])
+            }
+            catch (e) {
+                alert(e.response.data.mensagem)
+            }
+            finally {
+                await setValores(aux)
+                await setIsEditing(false)
+            }
         } else {
-            await setValores([...valores,  {
-                id: uniqid(),
-                nome
-            }])
+            try {
+                response = await axios.post(endpoint, {
+                    nome
+                })
+            }
+            catch (e) {
+                alert(e.response.data.mensagem)
+            }
+            finally {
+                await setValores([...valores,  {
+                    id: response.data[0].id,
+                    nome
+                }])
+            }
         }
 
         setNome('')
@@ -53,7 +77,20 @@ const Controladores = () => {
     }
 
     const deletar = async (id) => {
-        await setValores(valores.filter(item => item.id !== id))
+        try {
+            await axios.delete(endpoint, { 
+                data: {
+                    id
+                } 
+            })
+        }
+        catch (e) {
+            console.log(e)
+            alert(e.response.data.mensagem)
+        }
+        finally {
+            await setValores(valores.filter(item => item.id !== id))
+        }
     }
 
     const cancelar = async () => {
