@@ -35,6 +35,8 @@ const Culturas = () => {
     }, [])
 
     const salvar = async () => {
+        let response;
+
         if(isEditing) {
             let aux = valores;
 
@@ -53,8 +55,7 @@ const Culturas = () => {
             }
         } else {
             try {
-                await axios.post('/culturas', {
-                    id: uniqid(),
+                response = await axios.post('/culturas', {
                     descricao,
                     ativa
                 })
@@ -64,7 +65,7 @@ const Culturas = () => {
             }
             finally {
                 await setValores([...valores,  {
-                    id: uniqid(),
+                    id: response.data[0].id,
                     descricao,
                     ativa
                 }])
@@ -94,17 +95,13 @@ const Culturas = () => {
             })
         }
         catch (e) {
+            console.log(e)
             alert(e.response.data.mensagem)
         }
         finally {
-            await setValores([...valores,  {
-                id: uniqid(),
-                descricao,
-                ativa
-            }])
+            await setValores(valores.filter(item => item.id !== id))
         }
 
-        await setValores(valores.filter(item => item.id !== id))
     }
 
     const cancelar = async () => {
