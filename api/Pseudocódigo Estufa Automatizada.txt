@@ -1,0 +1,31 @@
+setup:  
+    inicializaEthernet
+    getSensores
+    inicializaMqtt
+
+loop:
+    leitura = 0
+    totalDeSensores = 0;
+
+    para cada sensor
+        leituraAux = //função leitura sensor
+        leitura += leituraAux
+        totalDeSensores++
+
+        enviaMensagemMQTT
+
+        se o proximo sensor não for do mesmo tipo 
+        (quer dizer que todos os sensores do mesmo tipo foram lidos, podemos calcular a média e agir)
+            media = (leitura / totalDeSensores)
+
+            se media < parametroMinimo
+                ativa Relé[portaMinimo]
+                desativa Relé[portaMaximo]
+            se media > parametroMaximo
+                ativa Relé[portaMaximo]
+                desativa Relé[portaMinimo]
+
+            leitura = 0
+            contador = 0
+        senão
+            //segue o jogo
