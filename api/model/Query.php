@@ -25,7 +25,7 @@ class Query
 
             $stm->execute();
 
-            return json_encode(["sucesso" => true]);
+            return json_encode(["sucesso" => true, "id" => $pdo->lastInsertId()]);
         } catch (PDOException $e) {
             // echo "Erro:" . $e->getMessage();
             http_response_code(500);
