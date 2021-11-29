@@ -8,34 +8,34 @@ class ControladorController implements ICRUD
 {
     public function index()
     {
-        $qry = 'SELECT * FROM culturas';
+        $qry = 'SELECT * FROM controladores';
     
         echo Query::select($qry);
     }
       
     public function store($request)
     {
-        $ativa = (int)$request->ativa;
-    
-        $qry = "INSERT INTO culturas(descricao, ativa, created_at, updated_at) VALUES (";
-        $qry .= "'" . $request->descricao . "'";
-        $qry .= ",";
-        $qry .= "'" . $ativa . "'";
+        $qry = "INSERT INTO controladores(nome, created_at, updated_at) VALUES (";
+        $qry .= "'" . $request->nome . "'";
         $qry .= ",";
         $qry .= "'" . Carbon::now()->toDateTimeString() . "'";
         $qry .= ",";
         $qry .= "'" . Carbon::now()->toDateTimeString() . "'";
         $qry .= ")";
-    
-        echo Query::insertOrUpdate($qry);
+
+        $retorno = Query::insertOrUpdate($qry);
+
+        $id = json_decode($retorno)->id;
+        echo Query::select("SELECT * from controladores WHERE id={$id}");
+
+        return;
     }
     
     public function update($request)
     {
         $agora = Carbon::now()->toDateTimeString();
-        $ativa = (int)$request->ativa;
     
-        $qry = "UPDATE culturas SET descricao = '{$request->descricao}', ativa = {$ativa}, updated_at = '$agora'";
+        $qry = "UPDATE controladores SET nome='{$request->nome}', updated_at='$agora'";
         $qry .= " where id = {$request->id}";
     
         echo Query::insertOrUpdate($qry);
@@ -44,7 +44,7 @@ class ControladorController implements ICRUD
       
     public function delete($request)
     {
-        $qry = "DELETE FROM culturas";
+        $qry = "DELETE FROM controladores";
         $qry .= " where id = {$request->id}";
     
         echo Query::insertOrUpdate($qry);
