@@ -14,7 +14,12 @@
             ],
             "defines": [
                 "USBCON"
-            ]
+            ],
+            "intelliSenseMode": "windows-msvc-x64",
+            "compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+            "cStandard": "c89",
+            "cppStandard": "gnu++98"
         }
-    ]
+    ],
+    "version": 4
 }
