@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Form, Table, Grid, Button, Icon } from 'semantic-ui-react'
 import uniqid from 'uniqid'
+import axios from 'axios'
 
 const val = [
     {
@@ -12,6 +13,8 @@ const val = [
         unidade: '%',
         referencia_minima: 200,
         referencia_maxima: 500,
+        porta_atuador_minimo: 12,
+        porta_atuador_maximo: 13,
         controlador_id: 1
     },
     {
@@ -23,6 +26,8 @@ const val = [
         unidade: 'lux',
         referencia_minima: 200,
         referencia_maxima: 500,
+        porta_atuador_minimo: 12,
+        porta_atuador_maximo: null,
         controlador_id: 2
     },
     {
@@ -34,6 +39,8 @@ const val = [
         unidade: '',
         referencia_minima: 200,
         referencia_maxima: 500,
+        porta_atuador_minimo: 14,
+        porta_atuador_maximo: 11,
         controlador_id: 1
     }
 ]
@@ -48,24 +55,33 @@ const Sensores = () => {
     const [tipoSensor, setTipoSensor] = useState('')
     const [referenciaMinima, setReferenciaMinima] = useState('')
     const [referenciaMaxima, setReferenciaMaxima] = useState('')
+    const [portaMinimo, setPortaMinimo] = useState('')
+    const [portaMaximo, setPortaMaximo] = useState('')
     const [unidade, setUnidade] = useState('')
     const [controlador_id, setControlador] = useState(null)
-    const [controladores, setControladores] = useState([
-        {
-            id: 1,
-            nome: 'Arduino Mega 2560 - Início',
-        },
-        {
-            id: 2,
-            nome: 'Arduino Mega 2560 - Janela',
-        }
-    ])
+    const [controladores, setControladores] = useState([])
+    const [optionsControladores, setOptionsControladores] = useState([])
 
     const [isEditing, setIsEditing] = useState(false)
     const [index, setIndex] = useState(false)
+    const endpoint = '/sensores'
 
-    useEffect(() => {
-        setValores(val)
+    useEffect(async () => {
+        let response = await axios.get(endpoint)
+
+        setValores(response.data)
+
+        response = await axios.get('/controladores')
+
+        setControladores(response.data)
+        let optionsControladores = response.data.map(item => { 
+            return { 
+                key: uniqid(), 
+                text: item.nome, 
+                value: item.id 
+            } 
+        })
+        setOptionsControladores(optionsControladores)
     }, [])
 
     const limparFormulario = () => {
@@ -73,6 +89,8 @@ const Sensores = () => {
         setPorta('')
         setReferenciaMinima('')
         setReferenciaMaxima('')
+        setPortaMinimo('')
+        setPortaMaximo('')
         setUnidade('')
         setTipoPorta(null)
         setTipoSensor(null)
@@ -80,6 +98,8 @@ const Sensores = () => {
     }
 
     const salvar = async () => {
+        let response;
+
         if (isEditing) {
             let aux = valores;
 
@@ -90,22 +110,53 @@ const Sensores = () => {
             aux[index].controlador_id = controlador_id;
             aux[index].referencia_minima = referenciaMinima;
             aux[index].referencia_maxima = referenciaMaxima;
+            aux[index].porta_atuador_minimo = portaMinimo;
+            aux[index].porta_atuador_maximo = portaMaximo;
             aux[index].unidade = unidade;
 
-            await setValores(aux)
-            await setIsEditing(false)
+            try {
+                await axios.put(endpoint, aux[index])
+            }
+            catch (e) {
+                alert(e.response.data.mensagem)
+            }
+            finally {
+                await setValores(aux)
+                await setIsEditing(false)
+            }
         } else {
-            await setValores([...valores, {
-                id: uniqid(),
-                descricao,
-                porta,
-                tipo_porta: tipoPorta,
-                controlador_id: controlador_id,
-                tipo_sensor: tipoSensor,
-                referencia_minima: referenciaMinima,
-                referencia_maxima: referenciaMaxima,
-                unidade
-            }])
+            try {
+                response = await axios.post(endpoint, {
+                    descricao,
+                    porta,
+                    tipo_porta: tipoPorta,
+                    controlador_id: controlador_id,
+                    tipo_sensor: tipoSensor,
+                    referencia_minima: referenciaMinima,
+                    referencia_maxima: referenciaMaxima,
+                    porta_atuador_minimo: portaMinimo,
+                    porta_atuador_maximo: portaMaximo,
+                    unidade
+                })
+            }
+            catch (e) {
+                alert(e.response.data.mensagem)
+            }
+            finally {
+                await setValores([...valores, {
+                    id: response.data[0].id,
+                    descricao,
+                    porta,
+                    tipo_porta: tipoPorta,
+                    controlador_id: controlador_id,
+                    tipo_sensor: tipoSensor,
+                    referencia_minima: referenciaMinima,
+                    referencia_maxima: referenciaMaxima,
+                    porta_atuador_minimo: portaMinimo,
+                    porta_atuador_maximo: portaMaximo,
+                    unidade
+                }])
+            }
         }
 
         limparFormulario()
@@ -123,12 +174,27 @@ const Sensores = () => {
         await setControlador(valores[index].controlador_id)
         await setReferenciaMinima(valores[index].referencia_minima)
         await setReferenciaMaxima(valores[index].referencia_maxima)
+        await setPortaMinimo(valores[index].porta_atuador_minimo ?? '')
+        await setPortaMaximo(valores[index].porta_atuador_maximo ?? '')
         await setUnidade(valores[index].unidade)
         await setTipoSensor(valores[index].tipo_sensor)
     }
 
     const deletar = async (id) => {
-        await setValores(valores.filter(item => item.id !== id))
+        try {
+            await axios.delete(endpoint, { 
+                data: {
+                    id
+                } 
+            })
+        }
+        catch (e) {
+            console.log(e)
+            alert(e.response.data.mensagem)
+        }
+        finally {
+            await setValores(valores.filter(item => item.id !== id))
+        }
     }
 
     const cancelar = async () => {
@@ -168,11 +234,6 @@ const Sensores = () => {
         { key: uniqid(), text: 'Analógica', value: 1 }
     ]
 
-    const optionsControladores = [
-        { key: uniqid(), text: 'Arduino Mega 2560 - Início', value: 1 },
-        { key: uniqid(), text: 'Arduino Mega 2560 - Janela', value: 2 }
-    ]
-
     const optionsTipoSensor = [
         { key: uniqid(), text: 'Luminosidade', value: 'L' },
         { key: uniqid(), text: 'Umidade do Ar', value: 'U' },
@@ -194,13 +255,17 @@ const Sensores = () => {
             </Form.Group>
             <Form.Group widths='equal'>
                 <Form.Select options={optionsTipoPorta} onChange={(e, { value }) => { setTipoPorta(value) }} value={tipoPorta} label='Tipo da Porta' placeholder='Tipo da Porta' />
-                <Form.Select options={optionsControladores} label='Controlador' placeholder='Controlador' onChange={(e, { value }) => { setControlador(value) }} value={controlador_id}/>
-                <Form.Select options={optionsTipoSensor} label='Tipo do Sensor' placeholder='Tipo do Sensor' onChange={(e, { value }) => { setTipoSensor(value) }} value={tipoSensor}/>
+                <Form.Select options={optionsControladores} label='Controlador' placeholder='Controlador' onChange={(e, { value }) => { setControlador(value) }} value={controlador_id} />
+                <Form.Select options={optionsTipoSensor} label='Tipo do Sensor' placeholder='Tipo do Sensor' onChange={(e, { value }) => { setTipoSensor(value) }} value={tipoSensor} />
             </Form.Group>
             <Form.Group widths='equal'>
-                <Form.Input value={referenciaMinima} onChange={item => setReferenciaMinima(item.target.value)} label='Referência Mínina' placeholder='Referência Mínina' />
+                <Form.Input value={referenciaMinima} onChange={item => setReferenciaMinima(item.target.value)} label='Referência Mínima' placeholder='Referência Mínima' />
                 <Form.Input value={referenciaMaxima} onChange={item => setReferenciaMaxima(item.target.value)} label='Referência Máxima' placeholder='Referência Máxima' />
                 <Form.Input value={unidade} onChange={item => setUnidade(item.target.value)} label='Unidade' placeholder='ex. %, lux...' />
+            </Form.Group>
+            <Form.Group widths='equal'>
+                <Form.Input value={portaMinimo} onChange={item => setPortaMinimo(item.target.value)} label='Porta do Atuador Mínimo' placeholder='(Leitura abaixo do Mínimo)' />
+                <Form.Input value={portaMaximo} onChange={item => setPortaMaximo(item.target.value)} label='Porta do Atuador Máximo' placeholder='(Leitura acima do Máximo)' />
             </Form.Group>
             <Button.Group floated='right' style={{ marginBottom: 20 }}>
                 <Button primary onClick={salvar}>
@@ -222,6 +287,8 @@ const Sensores = () => {
                     <Table.HeaderCell key={uniqid()}>Tipo do Sensor</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Ref. Mínima</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Ref. Máxima</Table.HeaderCell>
+                    <Table.HeaderCell key={uniqid()}>Porta Min.</Table.HeaderCell>
+                    <Table.HeaderCell key={uniqid()}>Porta Máx.</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Controlador</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Unidade</Table.HeaderCell>
                     <Table.HeaderCell key={uniqid()}>Ações</Table.HeaderCell>
@@ -237,9 +304,11 @@ const Sensores = () => {
                         <Table.Cell key={uniqid()}>{getTipoSensorPorExtenso(item.tipo_sensor)}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.referencia_minima}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.referencia_maxima}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{item.porta_atuador_minimo}</Table.Cell>
+                        <Table.Cell key={uniqid()}>{item.porta_atuador_maximo}</Table.Cell>
                         <Table.Cell key={uniqid()}>{controladores.find(con => con.id === item.controlador_id)?.nome}</Table.Cell>
                         <Table.Cell key={uniqid()}>{item.unidade}</Table.Cell>
-                        
+
                         <Table.Cell className='center aligned'>
                             {actions.map(action => {
                                 return <Button icon onClick={() => action.action(item.id)} color={action.color} key={uniqid()}>
