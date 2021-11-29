@@ -7,23 +7,23 @@ use Workerman\Worker;
 $worker = new Worker();
 
 $worker->onWorkerStart = function(){
-    $mqtt = new Workerman\Mqtt\Client('mqtt://test.mosquitto.org:1883');
+    $mqtt = new Workerman\Mqtt\Client('mqtt://broker.hivemq.com:1883');
     
     $mqtt->onConnect = function($mqtt) {
-        $mqtt->subscribe('mobg/#', ["qos" => 2]);
+        $mqtt->subscribe('mobg/#', ["qos" => 0]);
     };
     
     $mqtt->onMessage = function($topic, $content){
-        echo "Tópico: " . $topic;
+        echo "\nTópico: " . $topic;
         echo "\nConteúdo: " . $content;
 
-        $controller = new LeituraController();
+        //$controller = new LeituraController();
 
-        $conteudo = new \stdClass();
-        $conteudo->sensor = explode('/', $topic)[1];
-        $conteudo->valor = $content;
+        //$conteudo = new \stdClass();
+        //$conteudo->sensor = explode('/', $topic)[1];
+        //$conteudo->valor = $content;
 
-        $controller->store($conteudo);
+        //$controller->store($conteudo);
     };
 
     $mqtt->connect();
