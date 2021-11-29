@@ -7,26 +7,15 @@ import axios from 'axios'
 import Cultura from '../components/Cultura'
 import { useDispatch, useSelector } from 'react-redux'
 import * as AppActions from '../store/actions/app'
-
-let array = [
-    { time: 0, value: 8 },
-    { time: 1, value: 5 },
-    { time: 2, value: 4 },
-    { time: 3, value: 9 },
-    { time: 4, value: 1 },
-    { time: 5, value: 7 },
-    { time: 6, value: 6 },
-    { time: 7, value: 3 },
-    { time: 8, value: 4 },
-    { time: 9, value: 3 }
-];
+import moment from 'moment'
+import uniqid from 'uniqid'
 
 const Home = () => {
     const dispatch = useDispatch();
-    const culturas = useSelector(state => state.app.culturas)
-    const controladores = useSelector(state => state.app.controladores)
-    const sensores = useSelector(state => state.app.sensores)
-    const leituras = useSelector(state => state.app.leituras)
+    const [culturas, setCulturas] = useState([])
+    const [controladores, setControladores] = useState([])
+    const [sensores, setSensores] = useState([])
+    const [leituras, setLeituras] = useState([])
 
     const handleMQTT = () => {
         var client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
@@ -36,23 +25,44 @@ const Home = () => {
         })
 
         client.on('message', async function (topic, message) {
-            await dispatch(AppActions.setLeituras(oldData => [...oldData, { time: oldData.length, value: message }]));
+            let sensor_id = topic.split('/')[1]
+            
+            console.log({ 
+                created_at: moment().format('YYYY-MM-DD H:mm:ss'),
+                id: uniqid(),
+                sensor_id,
+                valor: parseInt(message.toString())
+            })
+
+            await setLeituras(leituras => [
+                { 
+                    created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+                    id: uniqid(),
+                    sensor_id,
+                    valor: parseInt(message.toString())
+                },
+                ...leituras
+            ]);
         })
     }
 
     const getLeituras = async () => {
         let response = await axios.get('/leituras')
 
-        await dispatch(AppActions.setCulturas(response.data.culturas))
-        await dispatch(AppActions.setControladores(response.data.controladores))
-        await dispatch(AppActions.setSensores(response.data.sensores))
-        await dispatch(AppActions.setLeituras(response.data.leituras))
+        await setCulturas(response.data.culturas)
+        await setControladores(response.data.controladores)
+        await setSensores(response.data.sensores)
+        await setLeituras(response.data.leituras)
     }
 
     useEffect(() => {
         handleMQTT()
         getLeituras()
     }, [])
+
+    useEffect(() => {
+        console.log(leituras.length)
+    }, [leituras])
 
     return (<>
         <Header style={{ marginTop: 20, color: colors.green }} as='h2' icon textAlign='center'>
