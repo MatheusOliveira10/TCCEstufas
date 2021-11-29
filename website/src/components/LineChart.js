@@ -1,5 +1,5 @@
 import React from 'react'
-import Chart from 'chart.js'
+import { Chart } from 'chart.js'
 
 export default class LineChart extends React.Component {
     constructor(props) {
@@ -8,45 +8,21 @@ export default class LineChart extends React.Component {
     }
   
     componentDidUpdate() {
-      let data = Object.values(this.props.data)
-      this.myChart.data.labels = data.map(d => d.created_at);
+      console.log(this.props.data)
+      this.myChart.data = this.props.data;
       
-      this.myChart.data.datasets[0].data = data.map(d => d.valor);
-      this.myChart.update();
+      this.myChart.update('active');
     }
   
     componentDidMount() {
       this.myChart = new Chart(this.canvasRef.current, {
         type: 'line',
-        options: {
-          maintainAspectRatio: false,
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  min: 0
-                }
-              }
-            ]
-          }
-        },
-        data: {
-          labels: this.props.data.map(d => d.time),
-          datasets: [{
-            label: this.props.title,
-            data: this.props.data.map(d => d.value),
-            fill: 'none',
-            backgroundColor: this.props.color,
-            pointRadius: 2,
-            borderColor: this.props.color,
-            borderWidth: 1,
-            lineTension: 0
-          }]
-        }
+        options: this.props.options,
+        data: this.props.data
       });
     }
   
     render() {
-      return <canvas ref={this.canvasRef} />;
+      return <canvas ref={this.props.refChart} />;
     }
   }
