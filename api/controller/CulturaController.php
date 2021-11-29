@@ -27,7 +27,10 @@ class CulturaController implements ICRUD
         $qry .= "'" . Carbon::now()->toDateTimeString() . "'";
         $qry .= ")";
 
-        echo Query::insertOrUpdate($qry);
+        $retorno = Query::insertOrUpdate($qry);
+
+        $id = json_decode($retorno)->id;
+        echo Query::select("SELECT * from culturas WHERE id={$id}");
     }
 
     public function update($request)
@@ -45,7 +48,7 @@ class CulturaController implements ICRUD
     public function delete($request)
     {
         $qry = "DELETE FROM culturas";
-        $qry .= " where id = {$request->id}";
+        $qry .= " WHERE id = {$request->id}";
 
         echo Query::insertOrUpdate($qry);
     }
