@@ -8,9 +8,19 @@ class LeituraController implements ICRUD
 {
     public function index()
     {
-        $qry = 'SELECT * FROM leituras';
+        $retorno = [];
 
-        echo Query::select($qry);
+        $culturas = json_decode(Query::select('SELECT * FROM culturas WHERE ativa = 1'));
+        $sensores = json_decode(Query::select('SELECT * FROM sensores'));
+        $controladores = json_decode(Query::select('SELECT controladores.id, controladores.nome, controladores_culturas.cultura_id FROM controladores INNER JOIN controladores_culturas ON controladores.id=controladores_culturas.controlador_id'));
+        $leituras = json_decode(Query::select('SELECT * FROM leituras where created_at between "2021-11-01" and "2021-11-13"'));
+
+        $retorno['culturas'] = $culturas;
+        $retorno['sensores'] = $sensores;
+        $retorno['controladores'] = $controladores;
+        $retorno['leituras'] = $leituras;
+        
+        echo json_encode($retorno);
     }
       
     public function store($request)
