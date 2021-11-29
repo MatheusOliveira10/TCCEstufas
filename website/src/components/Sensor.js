@@ -7,13 +7,13 @@ const Sensor = ({ sensor, leituras }) => {
     let leiturasSensor = leituras.filter(item => item.sensor_id == sensor.id)
 
     return <div style={styles.cardContainer}>
-        <div>{sensor.descricao}</div>
+        <div>{sensor.descricao} - {sensor.id}</div>
         <Divider />
         <div style={styles.mainText}>
             {leiturasSensor[0]?.valor || '-'}
             {' ' + (sensor?.unidade || '')}
         </div>
-        <h4 style={{ fontFamily: 'Roboto Thin' }}>{moment(leiturasSensor[0]?.created_at).format('DD/MM/YYYY hh:mm:ss')}</h4>
+        <h4 style={{ fontFamily: 'Roboto Thin' }}>{moment(leiturasSensor[0]?.created_at).format('DD/MM/YYYY HH:mm:ss')}</h4>
     </div>
 }
 
