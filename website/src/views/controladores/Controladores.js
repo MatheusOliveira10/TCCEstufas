@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Table from '../../components/Table'
-import { Form, Checkbox, Grid, Button } from 'semantic-ui-react'
+import { Form, Checkbox, Grid, Button, Message } from 'semantic-ui-react'
 import uniqid from 'uniqid'
 import axios from 'axios'
 
@@ -23,9 +23,22 @@ const Controladores = () => {
     const [index, setIndex] = useState(false)
     const endpoint = '/controladores'
 
+    const [color, setColor] = useState('')
+    const [text, setText] = useState('')
+    const [visible, setVisible] = useState(false)
+
     useEffect(async () => {
-        let response = await axios.get(endpoint)
-        setValores(response.data)
+        try {
+            let response = await axios.get(endpoint)
+
+            setValores(response.data)
+        }
+        catch(e) {
+            setColor('red')
+            setText(e.response.data.mensagem || e.message)
+            setVisible(true)
+        }
+        
         // setValores(val)
     }, [])
 
@@ -39,9 +52,15 @@ const Controladores = () => {
 
             try {
                 await axios.put(endpoint, aux[index])
+
+                setColor('green')
+                setText(`Controlador ${aux[index].nome} editado com sucesso`)
+                setVisible(true)    
             }
             catch (e) {
-                alert(e.response.data.mensagem)
+                setColor('red')
+                setText(e.response.data.mensagem || e.message)
+                setVisible(true)
             }
             finally {
                 await setValores(aux)
@@ -52,9 +71,15 @@ const Controladores = () => {
                 response = await axios.post(endpoint, {
                     nome
                 })
+
+                setColor('green')
+                setText(`Controlador ${nome} criado com sucesso`)
+                setVisible(true)    
             }
             catch (e) {
-                alert(e.response.data.mensagem)
+                setColor('red')
+                setText(e.response.data.mensagem || e.message)
+                setVisible(true)
             }
             finally {
                 await setValores([...valores,  {
@@ -77,16 +102,23 @@ const Controladores = () => {
     }
 
     const deletar = async (id) => {
+        let controlador = valores.find(item => item.id === id)
+
         try {
             await axios.delete(endpoint, { 
                 data: {
                     id
                 } 
             })
+
+            setColor('green')
+            setText(`Controlador ${controlador.nome} deletado com sucesso`)
+            setVisible(true)    
         }
         catch (e) {
-            console.log(e)
-            alert(e.response.data.mensagem)
+            setColor('red')
+            setText(e.response.data.mensagem || e.message)
+            setVisible(true)
         }
         finally {
             await setValores(valores.filter(item => item.id !== id))
@@ -112,8 +144,19 @@ const Controladores = () => {
         }
     ]
 
+    const handleDismiss = () => {
+        setVisible(false)
+    }
+
     return <div>
         <Grid>
+            {visible &&
+                <Grid.Row>
+                    <Message onDismiss={handleDismiss} color={color} style={{ flexGrow: 1 }} floating>
+                        {text}
+                    </Message>
+                </Grid.Row>
+            }
             <Grid.Column floated='left' width={5}>
                 <h1>Controladores</h1>
             </Grid.Column>

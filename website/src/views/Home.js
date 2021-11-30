@@ -17,6 +17,10 @@ const Home = () => {
     const [sensores, setSensores] = useState([])
     const [leituras, setLeituras] = useState([])
 
+    const [color, setColor] = useState('')
+    const [text, setText] = useState('')
+    const [visible, setVisible] = useState(false)
+
     const handleMQTT = () => {
         var client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
 

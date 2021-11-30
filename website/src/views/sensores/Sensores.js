@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Table, Grid, Button, Icon } from 'semantic-ui-react'
+import { Form, Table, Grid, Button, Icon, Message } from 'semantic-ui-react'
 import uniqid from 'uniqid'
 import axios from 'axios'
 
@@ -66,12 +66,23 @@ const Sensores = () => {
     const [index, setIndex] = useState(false)
     const endpoint = '/sensores'
 
+    const [color, setColor] = useState('')
+    const [text, setText] = useState('')
+    const [visible, setVisible] = useState(false)
+
     useEffect(async () => {
         let response = await axios.get(endpoint)
 
         setValores(response.data)
 
-        response = await axios.get('/controladores')
+        try {
+            response = await axios.get('/controladores')
+        }
+        catch(e) {
+            setColor('red')
+            setText(e.response.data.mensagem || e.message)
+            setVisible(true)
+        }
 
         setControladores(response.data)
         let optionsControladores = response.data.map(item => { 
@@ -116,9 +127,15 @@ const Sensores = () => {
 
             try {
                 await axios.put(endpoint, aux[index])
+
+                setColor('green')
+                setText(`Sensor ${aux[index].descricao} editado com sucesso`)
+                setVisible(true)    
             }
             catch (e) {
-                alert(e.response.data.mensagem)
+                setColor('red')
+                setText(e.response.data.mensagem || e.message)
+                setVisible(true)
             }
             finally {
                 await setValores(aux)
@@ -138,9 +155,15 @@ const Sensores = () => {
                     porta_atuador_maximo: portaMaximo,
                     unidade
                 })
+
+                setColor('green')
+                setText(`Sensor ${descricao} criado com sucesso`)
+                setVisible(true)    
             }
             catch (e) {
-                alert(e.response.data.mensagem)
+                setColor('red')
+                setText(e.response.data.mensagem || e.message)
+                setVisible(true)
             }
             finally {
                 await setValores([...valores, {
@@ -181,16 +204,23 @@ const Sensores = () => {
     }
 
     const deletar = async (id) => {
+        let sensor = valores.find(item => item.id === id)
+
         try {
             await axios.delete(endpoint, { 
                 data: {
                     id
                 } 
             })
+
+            setColor('green')
+            setText(`Sensor ${sensor.descricao} deletado com sucesso`)
+            setVisible(true)    
         }
         catch (e) {
-            console.log(e)
-            alert(e.response.data.mensagem)
+            setColor('red')
+            setText(e.response.data.mensagem || e.message)
+            setVisible(true)
         }
         finally {
             await setValores(valores.filter(item => item.id !== id))
@@ -241,8 +271,19 @@ const Sensores = () => {
         { key: uniqid(), text: 'Temperatura do Ar', value: 'T' }
     ]
 
+    const handleDismiss = () => {
+        setVisible(false)
+    }
+
     return <div>
         <Grid>
+            {visible &&
+                <Grid.Row>
+                    <Message onDismiss={handleDismiss} color={color} style={{ flexGrow: 1 }} floating>
+                        {text}
+                    </Message>
+                </Grid.Row>
+            }
             <Grid.Column floated='left' width={5}>
                 <h1>Sensores</h1>
             </Grid.Column>
@@ -278,7 +319,7 @@ const Sensores = () => {
             </Button.Group>
         </Form>
 
-        <Table celled unstackable>
+        <Table celled>
             <Table.Header>
                 <Table.Row>
                     <Table.HeaderCell key={uniqid()}>Descrição</Table.HeaderCell>

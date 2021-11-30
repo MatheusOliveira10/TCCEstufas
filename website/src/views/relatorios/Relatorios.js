@@ -1,7 +1,7 @@
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Grid } from 'semantic-ui-react';
+import { Button, Grid, Message } from 'semantic-ui-react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 import moment from 'moment';
@@ -40,8 +40,24 @@ const Relatorios = () => {
         key: 'selection',
     })
 
+    const [color, setColor] = useState('')
+    const [text, setText] = useState('')
+    const [visible, setVisible] = useState(false)
+
     const getLeituras = async () => {
-        let response = await axios.get('/leituras')
+        let response;
+        
+        try {
+            response = await axios.get('/leituras')
+        }
+        catch(e) {
+            setColor('red')
+            setText(e.response.data.mensagem || e.message)
+            setVisible(true)
+            setTimeout(() => {
+                setVisible(false)
+            }, 4000)
+        }
 
         let { culturas, controladores, sensores, leituras } = response.data
         await setCulturas(culturas)
@@ -52,6 +68,9 @@ const Relatorios = () => {
         montarRelatorio(culturas, controladores, sensores)
     }
 
+    const handleDismiss = () => {
+        setVisible(false)
+    }
 
     const montarRelatorio = async (culturas, controladores, sensores, selectionRange = {startDate: new Date(), endDate: new Date()}) => {
         let periodo = `${moment(selectionRange.startDate).format('DD/MM/YYYY')} - ${moment(selectionRange.endDate).format('DD/MM/YYYY')}`
@@ -62,7 +81,22 @@ const Relatorios = () => {
             key: uniqid()
         }
 
-        let response = await axios.get('/relatorio', { params: { 'prd': periodo } })
+        let response;
+        
+        try {
+            response = await axios.get('/relatorio', { params: { 'prd': periodo } })
+        }
+        catch(e) {
+            setColor('red')
+            setText(e.response.data.mensagem || e.message)
+            setVisible(true)
+            // setTimeout(() => {
+            //     setVisible(false)
+            // }, 4000)
+
+            return;
+        }
+
         let leiturasRelatorio = response.data
         let dataIni = moment(selectionRange.startDate).format('YYYY-MM-DD')
         let date = moment(dataIni)
@@ -133,6 +167,13 @@ const Relatorios = () => {
 
     return <>
         <Grid>
+            {visible &&
+                <Grid.Row>
+                    <Message onDismiss={handleDismiss} color={color} style={{ flexGrow: 1 }} floating>
+                        {text}
+                    </Message>
+                </Grid.Row>
+            }
             <Grid.Row>
                 <Grid.Column floated='left' width={16}>
                     <h1>
