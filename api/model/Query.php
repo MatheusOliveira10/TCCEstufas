@@ -43,7 +43,9 @@ class Query
 
             if(!$result) {
                 \http_response_code(500);
-                echo "Erro na conexão com o banco";
+
+                return json_encode(["sucesso" => false, "mensagem" =>"Erro na conexão com o banco"]);
+
                 die();
             }
             $rows = $result->fetchAll(PDO::FETCH_CLASS);
